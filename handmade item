@@ -1,0 +1,25 @@
+class Solution {
+public:
+    int microsoftHandmadeItem(vector<int>& T) {
+        queue<int> queue;
+        for (int item : T) {
+            queue.push(item);
+        }
+        int res = 0;
+        int count = 0;
+        
+        while (!queue.empty()) {
+            int first = queue.front();
+            queue.pop();
+            count++;
+            first--;
+            
+            if (first > 0) {
+                queue.push(first);
+            } else if (first == 0) {
+                res += count;
+            }
+        }
+        return res;
+    }
+};
