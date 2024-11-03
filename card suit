@@ -1,0 +1,200 @@
+#include <iostream>
+#include <vector>
+#include <map>
+#include <string>
+#include <algorithm>
+
+class Results
+{
+public:
+  std::string set_name;
+  std::vector<std::string> taken_cards;
+
+  Results() : set_name("") {}
+};
+
+class Solution
+{
+public:
+  Results solution(const std::vector<std::string> &cards)
+  {
+    Results result;
+
+    if (cards.empty())
+    {
+      result.set_name = "single card";
+      return result;
+    }
+
+    // Sort cards by rank in descending order
+    auto sorted_cards = cards;
+    std::sort(sorted_cards.begin(), sorted_cards.end(),
+              [](const std::string &a, const std::string &b)
+              { return getRank(b[0]) < getRank(a[0]); });
+
+    // Check for each set type in order of strength
+    if (checkTripleAndPair(sorted_cards, result))
+      return result;
+    if (checkSuit(sorted_cards, result))
+      return result;
+    if (checkFiveInARow(sorted_cards, result))
+      return result;
+    if (checkTriple(sorted_cards, result))
+      return result;
+    if (checkPair(sorted_cards, result))
+      return result;
+
+    // If no other set is found, return the highest single card
+    result.set_name = "single card";
+    result.taken_cards.push_back(sorted_cards[0]);
+
+    return result;
+  }
+
+private:
+  bool checkTripleAndPair(const std::vector<std::string> &cards, Results &result)
+  {
+    auto rankGroups = groupByRank(cards);
+
+    std::string triple, pair;
+
+    for (const auto &entry : rankGroups)
+    {
+      if (entry.second.size() >= 3 && triple.empty())
+      {
+        triple = entry.first;
+      }
+      else if (entry.second.size() >= 2 && pair.empty())
+      {
+        pair = entry.first;
+      }
+
+      if (!triple.empty() && !pair.empty())
+      {
+        result.set_name = "a triple and a pair";
+        result.taken_cards.insert(result.taken_cards.end(), rankGroups[triple].begin(), rankGroups[triple].begin() + 3);
+        result.taken_cards.insert(result.taken_cards.end(), rankGroups[pair].begin(), rankGroups[pair].begin() + 2);
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  bool checkSuit(const std::vector<std::string> &cards, Results &result)
+  {
+    auto suitGroups = groupBySuit(cards);
+
+    for (const auto &suitCards : suitGroups)
+    {
+      if (suitCards.second.size() >= 5)
+      {
+        result.set_name = "suit";
+        result.taken_cards.insert(result.taken_cards.end(), suitCards.second.begin(), suitCards.second.begin() + 5);
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  bool checkFiveInARow(const std::vector<std::string> &cards, Results &result)
+  {
+    int consecutiveCount = 1;
+    std::vector<std::string> consecutiveCards{cards[0]};
+
+    for (size_t i = 1; i < cards.size() && consecutiveCount < 5; ++i)
+    {
+      if (getRank(cards[i][0]) == getRank(cards[i - 1][0]) - 1)
+      {
+        consecutiveCount++;
+        consecutiveCards.push_back(cards[i]);
+      }
+      else if (getRank(cards[i][0]) != getRank(cards[i - 1][0]))
+      {
+        consecutiveCount = 1;
+        consecutiveCards = {cards[i]};
+      }
+    }
+
+    if (consecutiveCount >= 5)
+    {
+      result.set_name = "five in a row";
+      result.taken_cards.insert(result.taken_cards.end(), consecutiveCards.begin(), consecutiveCards.begin() + 5);
+      return true;
+    }
+
+    return false;
+  }
+
+  bool checkTriple(const std::vector<std::string> &cards, Results &result)
+  {
+    auto rankGroups = groupByRank(cards);
+
+    for (const auto &rankCards : rankGroups)
+    {
+      if (rankCards.second.size() >= 3)
+      {
+        result.set_name = "triple";
+        result.taken_cards.insert(result.taken_cards.end(), rankCards.second.begin(), rankCards.second.begin() + 3);
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  bool checkPair(const std::vector<std::string> &cards, Results &result)
+  {
+    auto rankGroups = groupByRank(cards);
+
+    for (const auto &rankCards : rankGroups)
+    {
+      if (rankCards.second.size() >= 2)
+      {
+        result.set_name = "pair";
+        result.taken_cards.insert(result.taken_cards.end(), rankCards.second.begin(), rankCards.second.begin() + 2);
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  std::map<char, std::vector<std::string>> groupByRank(const std::vector<std::string> &cards)
+  {
+    std::map<char, std::vector<std::string>> groups;
+    for (const auto &card : cards)
+    {
+      groups[card[0]].push_back(card);
+    }
+    return groups;
+  }
+
+  std::map<char, std::vector<std::string>> groupBySuit(const std::vector<std::string> &cards)
+  {
+    std::map<char, std::vector<std::string>> groups;
+    for (const auto &card : cards)
+    {
+      groups[card[1]].push_back(card);
+    }
+    return groups;
+  }
+
+  static int getRank(char rank)
+  {
+    switch (rank)
+    {
+    case 'A':
+      return 14;
+    case 'K':
+      return 13;
+    case 'Q':
+      return 12;
+    case 'J':
+      return 11;
+    default:
+      return rank - '0';
+    }
+  }
+};
