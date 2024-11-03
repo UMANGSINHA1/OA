@@ -1,0 +1,59 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+int solution(std::vector<int> &A, int K) {
+    // Sort the array
+    std::sort(A.begin(), A.end());
+
+    int n = A.size();
+    int third = n / 3;
+
+    // Identify the initial smallest and largest positions
+    int smallest = A[third - 1];
+    int largest = A[n - third];
+
+    // Calculate the initial difference
+    int max_diff = largest - smallest;
+
+    // Use K moves to adjust the values
+    // Strategy: Increase the smallest values or decrease the largest values to maximize the difference
+
+    // 1. Decrease the smallest values
+    for (int i = 0; i < third; ++i) {
+        int move = std::min(K, A[i] - A[0]); // Minimize towards the smallest value
+        A[i] -= move;
+        K -= move;
+        if (K == 0) break;
+    }
+
+    // 2. Increase the largest values
+    for (int i = n - 1; i >= n - third; --i) {
+        int move = std::min(K, A[n - 1] - A[i]); // Maximize towards the largest value
+        A[i] += move;
+        K -= move;
+        if (K == 0) break;
+    }
+
+    // Recalculate smallest and largest after K moves
+    smallest = A[third - 1];
+    largest = A[n - third];
+
+    // Calculate the new difference
+    max_diff = std::max(max_diff, largest - smallest);
+
+    return max_diff;
+}
+
+int main() {
+    // Example input
+    std::vector<int> A = {9, 12, 15, 5, 7, 13};
+    int K = 4;
+
+    // Call the solution function
+    int result = solution(A, K);
+
+    // Output the result
+    std::cout << "The maximum difference after " << K << " moves is: " << result << std::endl;
+
+    return 0;
