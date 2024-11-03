@@ -1,0 +1,30 @@
+#include<bits/stdc++.h>
+using namespace std;
+
+#define int long long
+
+ string solution(int N) {
+    string result = "";
+
+    int position = 0;
+    while (N > 0) {
+        if (N & 1) { 
+            if(position<26)
+            result += ('a' + position);
+            else
+            result+=("zz");
+        }
+        N = N/2; 
+        position++; 
+    }
+
+    
+    reverse(result.begin(), result.end());
+    return result;
+}
+
+int32_t main() {
+    int N ;
+    cin>>N;
+    cout << solution(N) << endl; 
+}
