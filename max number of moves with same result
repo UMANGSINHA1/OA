@@ -1,0 +1,22 @@
+int getMaximumMovesWithGivenSum(vector &a){
+  int n = a.size();
+  if(n<2)
+    return 0;
+  vector<vector> dp(n,vector(n,-1));
+  return 1+ max({dfs(a,a[0]+a[1],2,n-1,dp),dfs(a,a[0]+a[n-1],1,n-2,dp),dfs(a,a[n-2]+a[n-1],0,n-3,dp)});
+}
+
+int dfs(vector& a, int sum , int start ,int end, vector<vector>& dp){
+  if(start >=end)
+    return 0;
+  if(dp[start][end] != -1)
+    return dp[start][end];
+  int way1 = 0, way2 = 0, way3 = 0;
+  if(a[start]+a[end] == sum)
+    way1 = 1+dfs(a,sum,start+1,end-1);
+  if(a[start]+a[start+1] == sum)
+    way2 = 1+dfs(a,sum,start+2,end);
+  if(a[end-1]+a[end] == sum)
+    way3 = 1+dfs(a,sum,start,end-2);
+  return dp[start][end] = max({way1,way2,way3});
+}
