@@ -1,0 +1,59 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+long long numsub(vector<int>& nums, int k) {
+    unordered_map<int, int> mp;
+    long long cnt = 0;
+    long long j = 0; 
+    long long res = 0;
+
+    for (long long i = 0; i < nums.size(); i++) {
+        while (j < nums.size() && cnt < k) {
+            mp[nums[j]]++;
+            if (mp[nums[j]] == 1)
+                cnt++;
+            j++;
+        }
+        if (cnt == k) {
+            res += (nums.size() - j + 1);
+        }
+        mp[nums[i]]--;
+        if (mp[nums[i]] == 0)
+            cnt--;
+    }
+    return res;
+}
+
+int medianOfUniquenessArray(vector<int>& nums) {
+    long long size = (long long)nums.size() * (nums.size() + 1) / 2;
+    long long a = 1, b = nums.size();
+
+    // Binary search
+    while (true) {
+        if (a == b)
+            return a;
+        if (abs(a - b) == 1) {
+            long long x1 = size - numsub(nums, a + 1);
+            if (x1 >= (size + 1) / 2)
+                return a;
+            return b;
+        }
+        long long mid = (a + b) / 2;
+        long long x = size - numsub(nums, mid + 1);
+        if (x == (size + 1) / 2)
+            return mid;
+        if (x > ((size + 1) / 2)) {
+            b = mid;
+        } else {
+            a = mid + 1;
+        }
+    }
+    return 0;
+}
+
+int main() {
+    vector<int> nums = {1, 2, 3}; 
+    int ans = medianOfUniquenessArray(nums);
+    cout << ans << "\n";
+    return 0;
+}
