@@ -1,0 +1,51 @@
+#include <iostream>
+#include <vector>
+#include <sstream>
+#include <string>
+
+using namespace std;
+
+int fairIndexes(const vector<int>& a, const vector<int>& b) {
+    int sumA = 0, sumB = 0;
+    for (int i = 0; i < a.size(); i++) {
+        sumA += a[i];
+        sumB += b[i];
+    }
+
+    int count = 0;
+    int tempA = a[0];
+    int tempB = b[0];
+    for (int j = 1; j < a.size(); j++) {
+        if (j != 1 && tempA == tempB && 2 * tempA == sumA && 2 * tempB == sumB) {
+            count++;
+        }
+        tempA += a[j];
+        tempB += b[j];
+    }
+    return count;
+}
+
+vector<int> splitWords(const string& s) {
+    vector<int> result;
+    istringstream stream(s);
+    string word;
+    while (stream >> word) {
+        result.push_back(stoi(word));
+    }
+    return result;
+}
+
+int main() {
+    string inputA, inputB;
+    
+    getline(cin, inputA);
+    getline(cin, inputB);
+
+    vector<int> a = splitWords(inputA);
+    vector<int> b = splitWords(inputB);
+
+    int res = fairIndexes(a, b);
+    cout << res << endl;
+
+    return 0;
+}
