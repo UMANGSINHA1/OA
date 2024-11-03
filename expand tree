@@ -1,0 +1,24 @@
+class Solution {
+public:
+    Node* expandTree(Node* root) {
+        if(!root) return nullptr;
+
+        queue<Node*>q;
+        while(!q.empty()){
+            auto p = q.front();
+            q.pop();
+            if(p->right==NULL && p->left==NULL){
+                Node* l = new Node(p->val);
+                Node* r = new Node(p->val);
+                p->right = r;
+                p->left = l;
+            }
+            else{
+                if(p->left)q.push(p->left);
+                if(p->right)q.push(p->right);
+            }
+        }
+        return root;
+
+    }
+};
