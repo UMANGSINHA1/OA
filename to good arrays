@@ -1,0 +1,74 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+const int MOD = 1000000007;
+
+long long powMod(int base, int exp, int mod) {
+    long long result = 1;
+    long long b = base;
+    while (exp > 0) {
+        if (exp % 2 == 1) result = (result * b) % mod;
+        b = (b * b) % mod;
+        exp /= 2;
+    }
+    return result;
+}
+
+int count_good_arrays(int N, int M, int K) {
+    // Count valid pairs (x, y) such that x * y == M
+    int valid_pairs = 0;
+    for (int x = 1; x <= 3; x++) {
+        for (int y = 1; y <= 3; y++) {
+            if (x * y == M) {
+                valid_pairs++;
+            }
+        }
+    }
+
+    if (K == 0) {
+        // Total arrays = 3^N
+        long long total_arrays = powMod(3, N, MOD);
+
+        // Count invalid arrays (those that have at least one valid pair)
+        long long invalid_count = 0;
+        for (int mask = 0; mask < (1 << (N - 1)); mask++) {
+            bool hasValidPair = false;
+            for (int i = 0; i < N - 1; i++) {
+                int x = (mask >> i) & 1 ? 3 : ((i % 2) + 1); // Replace with appropriate logic to simulate array values
+                int y = (mask >> (i + 1)) & 1 ? 3 : (((i + 1) % 2) + 1);
+                if (x * y == M) {
+                    hasValidPair = true;
+                    break;
+                }
+            }
+            if (hasValidPair) invalid_count++;
+        }
+
+        return (total_arrays - invalid_count + MOD) % MOD;
+    }
+
+    if (K == 1) {
+        long long count = 0;
+        for (int i = 0; i < N - 1; i++) {
+            for (const auto& valid_pair : vector<pair<int, int>>{{1, 3}, {3, 1}}) {
+                long long left_choices = powMod(3, i, MOD);
+                long long right_choices = powMod(3, N - 2 - i, MOD);
+                count = (count + left_choices * right_choices) % MOD;
+            }
+        }
+        return count;
+    }
+
+    return 0;
+}
+
+int main() {
+    int N, M, K;
+    cin >> N;
+    cin >> M;
+    cin >> K;
+    int result = count_good_arrays(N, M, K);
+    cout << result << endl;
+
+    return 0;
+}
