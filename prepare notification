@@ -1,0 +1,36 @@
+class Solution {
+public:
+    string prepareNotification(string message, int k) {
+        int n = message.length(), len = 0;
+        if (n <= k) {
+            return message;
+        }
+
+        stringstream ss(message);
+        string word;
+        vector<string> words;
+
+        while (ss >> word) {
+            words.push_back(word);
+        }
+
+        string res;
+        for (const string& st : words) {
+            int a = len + st.length() + 1;
+            if (a <= k - 3) {
+                res += st + " ";
+                len += st.length() + 1;
+            } else {
+                break;
+            }
+        }
+
+        res = res.substr(0, res.find_last_not_of(" ") + 1);
+
+        if (res.length() < n) {
+            res += "...";
+        }
+
+        return res;
+    }
+};
