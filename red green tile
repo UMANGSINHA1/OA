@@ -1,0 +1,41 @@
+int dfs(int node, unordered_map<int, vector<int>> &graph, unordered_set<int> &visited)
+{
+  visited.insert(node);
+  int max_length = 1;
+  for (int neighbor : graph[node])
+  {
+    if (visited.find(neighbor) == visited.end())
+    {
+      max_length = max(max_length, 1 + dfs(neighbor, graph, visited));
+    }
+  }
+  visited.erase(node);
+  return max_length;
+}
+
+int solution(vector<string> &A)
+{
+  int N = A.size();
+  unordered_map<int, vector<int>> graph;
+
+  // Construct the graph
+  for (int i = 0; i < N; ++i)
+  {
+    for (int j = 0; j < N; ++j)
+    {
+      if (i != j && A[i][1] == A[j][0])
+      {
+        graph[i].push_back(j);
+      }
+    }
+  }
+
+  int max_length = 0;
+  unordered_set<int> visited;
+  for (int i = 0; i < N; ++i)
+  {
+    max_length = max(max_length, dfs(i, graph, visited));
+  }
+
+  return max_length;
+}
