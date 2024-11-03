@@ -1,0 +1,15 @@
+
+class Solution {
+public:
+	string getAlphabeticallySmallestString(string s1) {
+		int n = s1.size();
+		for (int i = 0; i < n - 1; i++) {
+			if (s1[i] > s1[i + 1]) {
+				s1.erase(i, 1);
+				return s1;
+			}
+		}
+
+		return s1.substr(0, s1.size() - 1);
+	}
+};
