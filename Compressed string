@@ -1,0 +1,96 @@
+bool powerTen(int num) {
+    return (num == 10 || num == 100 || num == 1000 || num == 10000 || num == 100000);
+}
+
+int shortestPossibleLength(String S, int K) {
+    int n = S.size();
+    stack<pair<char, int>> st; // Stack to store characters and their consecutive counts in reverse order
+    int count = 1;             // Counter for consecutive characters
+    char ch = S[n - 1];        // Initialize with the last character in S
+    int right = 0;             // Compressed length of the right part of the string
+
+    // Step 1: Build initial stack and calculate initial right-side compressed length
+    for (int i = n - 2; i >= 0; i--) {
+        if (ch == S[i]) {
+            count++; // Count consecutive characters
+        } else {
+            // Push the character and its count to the stack
+            st.push({ch, count});
+            // Update the right length for the compressed representation
+            if (count > 1) right += (int)(to_string(count)).size(); // Add size of count if > 1
+            right++; // Add 1 for the character itself
+            // Reset for the new segment
+            ch = S[i];
+            count = 1;
+        }
+    }
+
+    // Push the last character block to the stack
+    st.push({ch, count});
+    if (count > 1) right += (int)(to_string(count)).size();
+    right++;
+
+    // Sliding window variables
+    count = 0;          // Counter for left part of the sliding window
+    int left = 0;       // Compressed length of the left part
+    int i = 0, j = 0;   // Sliding window pointers
+    int result = right; // Initialize the result with the initial right compressed length
+
+    // Step 2: Use sliding window to remove K characters and calculate minimum compressed length
+    while (j < n && !st.empty()) {  // Process until the end of S or the stack is empty
+        char rchar = st.top().first;  // Current character in the right part
+        int rcount = st.top().second; // Count of consecutive rchar in the stack
+        st.pop();
+
+        // Adjust right compressed length based on certain conditions
+        if (rcount <= 2 || powerTen(rcount)) {
+            right--; // Reduce right length if count is small or a power of 10
+        }
+        // Decrement the count of rchar and push back if still greater than 1
+        if (rcount > 1) {
+            st.push({rchar, rcount - 1});
+        }
+
+        // Check if window size equals K (i.e., we have removed K characters)
+        if (j - i + 1 == K) {
+            // Calculate lengths for potential merging of left and right segments
+            int jointlen = 0;   // Combined length if merging left and right
+            int leftlen = 0;    // Compressed length of left segment
+            int rightlen = 0;   // Compressed length of right segment
+
+            // Check if left and right segments can be merged
+            if (count > 0 && !st.empty() && ch == st.top().first) {
+                int count1 = st.top().second;
+                if (count1 > 1) rightlen = (int)(to_string(count1)).size();
+                rightlen++;  // Account for the character itself
+                if (count > 1) leftlen = (int)(to_string(count)).size();
+                leftlen++;   // Account for the character itself
+
+                // Calculate joint length if left and right segments are merged
+                int temp = count + count1;
+                if (temp > 1) jointlen = (int)(to_string(temp)).size();
+                jointlen++;
+            }
+
+            // Update the minimum compressed length found
+            result = min(result, right + left - leftlen - rightlen + jointlen);
+
+            // Update the left part with the leftmost character
+            if (count == 0 || ch != S[i]) {
+                ch = S[i];
+                count = 1;
+                left++; // Increment left length for a single character
+            } else {
+                // Adjust left length based on count conditions
+                if (count == 1 || powerTen(count + 1)) {
+                    left++;
+                }
+                count++;
+            }
+            i++;  // Move left pointer of the window
+        }
+        j++;  // Expand the window to the right
+    }
+
+    return result;
+}
