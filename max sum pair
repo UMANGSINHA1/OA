@@ -1,0 +1,49 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+int getDigitMask(int number) {
+    int mask = 0;
+    if (number == 0) {
+        // Special case: if the number is 0, its mask should include only the 0th bit
+        mask |= (1 << 0);
+    }
+    while (number > 0) {
+        int digit = number % 10;
+        mask |= (1 << digit);  // Set the bit corresponding to the digit
+        number /= 10;
+    }
+    return mask;
+}
+
+int solution(vector<int>& A) {
+    unordered_map<int, int> maxForMask;
+
+    // Step 1: Populate the map with the maximum values for each unique digit mask
+    for (int number : A) {
+        int mask = getDigitMask(number);
+        if (maxForMask.find(mask) != maxForMask.end()) {
+            maxForMask[mask] = max(maxForMask[mask], number);
+        } else {
+            maxForMask[mask] = number;
+        }
+    }
+
+    // Step 2: Find the largest sum of two numbers with non-overlapping digit masks
+    int maxSum = -1;
+    vector<int> masks;
+    for (const auto& entry : maxForMask) {
+        masks.push_back(entry.first);
+    }
+
+    // Compare each unique pair of masks
+    for (size_t i = 0; i < masks.size(); ++i) {
+        for (size_t j = i + 1; j < masks.size(); ++j) {
+            if ((masks[i] & masks[j]) == 0) {  // No common digits
+                int sumOfPair = maxForMask[masks[i]] + maxForMask[masks[j]];
+                maxSum = max(maxSum, sumOfPair);
+            }
+        }
+    }
+
+    return maxSum;
+}
