@@ -1,0 +1,23 @@
+int calculateLeftoverOnes(std::vector<int>& stacks) {
+    int n=stacks.size();
+    int totalLeftover = 0; // Initialize the total count of leftover stacks with 1 block
+
+    for (int i = 0; i < stacks.size(); ++i) {
+        int currentStack = stacks[i];
+
+        if (i < stacks.size() - 1) { // If there is a next stack
+            // Transfer blocks to next stack after converting every 2 blocks to 1
+            stacks[i + 1] += currentStack / 2;
+        }
+
+        // Count the leftover blocks that cannot be converted
+        if (currentStack % 2 == 1) {
+            totalLeftover++;
+        }
+    }
+    
+    if(stacks[n-1]%2==1){
+        totalLeftover++;
+    }
+    return totalLeftover;
+}
