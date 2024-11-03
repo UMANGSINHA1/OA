@@ -1,0 +1,34 @@
+class Solution {
+public:
+    vector<int> skyscraper(vector<int>& A) {
+        int n = A.size();
+        vector<pair<int, int>> height(n);
+        
+        for (int i = 0; i < n; i++) {
+            height[i] = {A[i], i};
+        }
+        
+        sort(height.begin(), height.end(), [](const pair<int, int>& h1, const pair<int, int>& h2) {
+            return h2.first < h1.first;
+        });
+        
+        vector<int> ans(n);
+        ans[height[0].second] = height[0].first;
+        int bound = height[0].first;
+        
+        for (int i = 1; i < n; i++) {
+            int currHeight = height[i].first;
+            int currIndex = height[i].second;
+            
+            if (currHeight >= bound) {
+                ans[currIndex] = --bound;
+            } else {
+                ans[currIndex] = currHeight;
+                bound = currHeight;
+            }
+        }
+        
+        return ans;
+    }
+};
+
