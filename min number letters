@@ -1,0 +1,34 @@
+class Solution {
+public:
+	int f1(vector<int> &arr, int prevIndex, int n, int i, vector<vector<int>> &memo) {
+		if (i == n) {
+			return 0;
+		}
+
+		if (memo[i][prevIndex + 1] != -1) {
+			return memo[i][prevIndex + 1];
+		}
+
+		int length = 0 + f1(arr, prevIndex, n, i + 1, memo);
+		if (prevIndex == -1 || arr[i] >= arr[prevIndex]) {
+			length = 1 + f1(arr, i, n, i + 1, memo);
+		}
+		return memo[i][prevIndex + 1] = length;
+	}
+	int minNumLetters(string s1) {
+		int n = s1.size();
+
+		if (n <= 1) {
+			return n;
+		}
+
+		vector<int> arr(n);
+		for (int i = 0; i < n; i++) {
+			arr[i] = (int)s1[i];
+		}
+		// print(arr);
+		vector<vector<int>> memo(n + 1, vector<int>(n + 1, -1));
+		int lcs = f1(arr, -1, n, 0, memo);
+		return (n - lcs);
+	}
+};
