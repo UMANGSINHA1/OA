@@ -1,0 +1,27 @@
+#include<bits/stdc++.h>
+using namespace std;
+class Solution {
+public:
+	int minimumSubstringsWithoutRepeatingCharacters(string& s1) {
+		int n = s1.size();
+		if (n == 0) return 0;
+
+		unordered_map<char, int> charMap;
+		int left = 0, substrCount = 1;
+
+		for (int right = 0; right < n; ++right) {
+			charMap[s1[right]]++;
+
+			if (charMap[s1[right]] > 1) {
+				++substrCount;
+				charMap.clear();
+				charMap[s1[right]] = 1;
+				// cout << left << " " << right << endl;
+				left = right;
+
+			}
+		}
+
+		return substrCount;
+	}
+};
