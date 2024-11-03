@@ -1,0 +1,77 @@
+#include <vector>
+#define MOD 1000000007
+#define MAX_VAL 100000
+
+using namespace std;
+
+class Solution {
+public:
+    // Function to calculate 2^n % MOD
+    long long power_of_2(int n) {
+        long long result = 1;
+        long long base = 2;
+        while (n > 0) {
+            if (n % 2 == 1) {
+                result = (result * base) % MOD;
+            }
+            base = (base * base) % MOD;
+            n /= 2;
+        }
+        return result;
+    }
+
+    // Function to count the number of great subsequences
+    long long count_great_subsequences(const vector<int>& freq) {
+        vector<long long> dp(MAX_VAL + 1, 0);
+
+        // Calculate dp using inclusion-exclusion principle
+        for (int d = MAX_VAL; d >= 2; --d) {
+            long long count = 0;
+            for (int multiple = d; multiple <= MAX_VAL; multiple += d) {
+                count += freq[multiple];
+            }
+            if (count > 0) {
+                dp[d] = power_of_2(count) - 1;
+                for (int multiple = 2 * d; multiple <= MAX_VAL; multiple += d) {
+                    dp[d] = (dp[d] - dp[multiple] + MOD) % MOD;
+                }
+            }
+        }
+
+        // Total number of great subsequences
+        long long total = 0;
+        for (int i = 2; i <= MAX_VAL; ++i) {
+            total = (total + dp[i]) % MOD;
+        }
+        return total;
+    }
+
+    // Main function to process the queries
+    int greatSubsequences(vector<int> A, vector<vector<int>>& queries) {
+        vector<int> freq(MAX_VAL + 1, 0);
+
+        // Fill frequency array
+        for (int num : A) {
+            freq[num]++;
+        }
+
+        long long result_sum = 0;
+
+        // Process each query
+        for (const auto& query : queries) {
+            int x = query[0];
+            int y = query[1];
+
+            // Update frequency array
+            int old_value = A[x - 1];
+            freq[old_value]--;
+            A[x - 1] = y;
+            freq[y]++;
+
+            // Calculate number of great subsequences
+            result_sum = (result_sum + count_great_subsequences(freq)) % MOD;
+        }
+
+        return (int)result_sum;
+    }
+};
